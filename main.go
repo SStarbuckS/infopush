@@ -64,14 +64,14 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	switch config.Type {
+	case "dingtalk_text":
+		result, err = SendDingTalkText(configPath, config.Config, params)
+	case "telegram_text":
+		result, err = SendTelegramText(configPath, config.Config, params)
 	case "wecom_mpnews":
 		result, err = SendWecomMPNews(configPath, config.Config, params)
 	case "wecom_robot_text":
 		result, err = SendWecomRobotText(configPath, config.Config, params)
-	case "telegram_text":
-		result, err = SendTelegramText(configPath, config.Config, params)
-	case "dingtalk_text":
-		result, err = SendDingTalkText(configPath, config.Config, params)
 	default:
 		http.Error(w, fmt.Sprintf("不支持的推送类型: %s", config.Type), http.StatusBadRequest)
 		fmt.Printf("[%s] 不支持的推送类型: %s\n", time.Now().Format("2006-01-02 15:04:05.000"), config.Type)

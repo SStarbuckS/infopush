@@ -1,5 +1,20 @@
 {
   "route": "/",
+  "dingtalk_text_example": {
+    "type": "dingtalk_text",
+    "config": {
+      "AccessToken": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "APIBaseURL": "https://oapi.dingtalk.com/robot/send"
+    }
+  },
+  "telegram_text_example": {
+    "type": "telegram_text",
+    "config": {
+      "Token": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk",
+      "ChatID": "123456789",
+      "APIBaseURL": "https://api.telegram.org"
+    }
+  },
   "wecom_mpnews_example1": {
     "type": "wecom_mpnews",
     "config": {
@@ -22,21 +37,6 @@
       "ThumbMediaID": "2nZYXWVUTSRQPONMLKJIHGFEDCBA0987654321zyxwvutsrqponmlkjihgfedcba",
       "Author": "消息机器人",
       "DefaultTitle": "重要提醒"
-    }
-  },
-  "telegram_text_example": {
-    "type": "telegram_text",
-    "config": {
-      "Token": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk",
-      "ChatID": "123456789",
-      "APIBaseURL": "https://api.telegram.org"
-    }
-  },
-  "dingtalk_text_example": {
-    "type": "dingtalk_text",
-    "config": {
-      "AccessToken": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-      "APIBaseURL": "https://oapi.dingtalk.com/robot/send"
     }
   },
   "wecom_robot_text_example": {
