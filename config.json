@@ -1,0 +1,55 @@
+{
+  "route": "/",
+  "wecom_mpnews_example1": {
+    "type": "wecom_mpnews",
+    "config": {
+      "APIBaseURL": "https://qyapi.weixin.qq.com",
+      "CorpID": "ww1a2b3c4d5e6f7g8h",
+      "CorpSecret": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+      "AgentID": "1000001",
+      "ThumbMediaID": "2nABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz",
+      "Author": "系统管理员",
+      "DefaultTitle": "通知消息"
+    }
+  },
+  "wecom_mpnews_example2": {
+    "type": "wecom_mpnews",
+    "config": {
+      "APIBaseURL": "https://qyapi.weixin.qq.com",
+      "CorpID": "ww9z8y7x6w5v4u3t2s",
+      "CorpSecret": "ZYXWVUTSRQPONMLKJIHGFEDCBAzyxwvutsrqponmlkjihgfedcba9876543210",
+      "AgentID": "1000002",
+      "ThumbMediaID": "2nZYXWVUTSRQPONMLKJIHGFEDCBA0987654321zyxwvutsrqponmlkjihgfedcba",
+      "Author": "消息机器人",
+      "DefaultTitle": "重要提醒"
+    }
+  },
+  "telegram_text_example": {
+    "type": "telegram_text",
+    "config": {
+      "Token": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk",
+      "ChatID": "123456789",
+      "APIBaseURL": "https://api.telegram.org"
+    }
+  },
+  "dingtalk_text_example": {
+    "type": "dingtalk_text",
+    "config": {
+      "AccessToken": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "APIBaseURL": "https://oapi.dingtalk.com/robot/send"
+    }
+  },
+  "wecom_robot_text_example": {
+    "type": "wecom_robot_text",
+    "config": {
+      "APIBaseURL": "https://qyapi.weixin.qq.com",
+      "Keys": [
+        "9f8e7d6c-5b4a-3928-1706-f5e4d3c2b1a0",
+        "3c2b1a09-8f7e-6d5c-4b3a-291817f6e5d4",
+        "7f6e5d4c-3b2a-1908-f7e6-d5c4b3a29081",
+        "2a19f8e7-d6c5-b4a3-9281-70f6e5d4c3b2",
+        "6d5c4b3a-2918-f7e6-d5c4-b3a2918f7e6d"
+      ]
+    }
+  }
+} 

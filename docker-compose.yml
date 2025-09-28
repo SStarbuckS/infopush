@@ -1,0 +1,9 @@
+services:
+  infopush:
+    image: sstarbucks/infopush:latest
+    container_name: infopush
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data/config.json:/app/config.json
