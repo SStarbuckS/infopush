@@ -263,7 +263,7 @@ Error: 具体错误信息
 服务运行时会在控制台输出详细的日志信息：
 
 ```
-[2025-09-29 00:42:12.714] wecom_example - 企业微信图文消息返回响应: {"errcode":0,"errmsg":"ok"}
+[2025-09-29 00:42:12.714] wecom_example - 企业微信图文返回响应: {"errcode":0,"errmsg":"ok"}
 [2025-09-29 00:42:12.715] wecom_example - Success
 
 [2025-09-29 00:42:13.856] wecom_robot_text_example - 企业微信群机器人文本返回响应: {"errcode":0,"errmsg":"ok"}
@@ -315,5 +315,4 @@ Error: 具体错误信息
    - 例如：`SendWecomRobotText`、`SendTelegramText`
 3. 在 `main.go` 的 `switch` 语句中添加新的 case
 4. 在配置文件中添加对应的配置示例
-
 5. 重新编译项目
