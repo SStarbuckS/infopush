@@ -264,6 +264,27 @@ curl -X POST "http://localhost:8080/dingtalk_text_example/" \
   -d "msg=系统告警：CPU使用率超过90%"
 ```
 
+#### Python 示例
+
+```
+def send_notification(push_content, retries=3, timeout=5):
+    push_url = "http://localhost:8080/wecom_example"
+    data = {
+        'title': '新提醒',  # 可选的
+        'msg': push_content  # 必要的
+    }
+    for attempt in range(retries):
+        try:
+            response = requests.post(push_url, data=data, timeout=timeout)
+            response.raise_for_status()  # 非2xx状态码会抛出异常
+            print(f"推送完成: {response.text}\n")
+            return
+        except Exception as error:
+            print(f"推送发生错误: {error}")
+        time.sleep(1)  # 等待一秒再重试
+    print("推送重试均失败。\n")
+```
+
 ### 响应格式
 
 **成功响应**:
@@ -339,4 +360,5 @@ Error: 具体错误信息
    - 例如：`SendWecomRobotText`、`SendTelegramText`
 3. 在 `main.go` 的 `switch` 语句中添加新的 case
 4. 在配置文件中添加对应的配置示例
+
 5. 重新编译项目
