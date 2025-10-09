@@ -1,3 +1,4 @@
+// 已修改：添加心跳检测功能 (heartbeat)
 package main
 
 import (
@@ -15,8 +16,10 @@ type PushConfig struct {
 
 // ConfigManager 配置管理器
 type ConfigManager struct {
-	Route   string `json:"route"`
-	Configs map[string]PushConfig
+	Route             string `json:"route"`
+	HeartbeatURL      string `json:"heartbeat_url"`
+	HeartbeatInterval int    `json:"heartbeat_interval"`
+	Configs           map[string]PushConfig
 }
 
 // NewConfigManager 创建配置管理器
@@ -45,10 +48,21 @@ func NewConfigManager(configFile string) (*ConfigManager, error) {
 		route = routeValue
 	}
 
-	// 提取推送配置（排除route字段）
+	// 提取心跳检测配置
+	heartbeatURL := ""
+	if urlValue, ok := rawConfig["heartbeat_url"].(string); ok {
+		heartbeatURL = urlValue
+	}
+
+	heartbeatInterval := 0
+	if intervalValue, ok := rawConfig["heartbeat_interval"].(float64); ok {
+		heartbeatInterval = int(intervalValue)
+	}
+
+	// 提取推送配置（排除route、heartbeat_url、heartbeat_interval字段）
 	configs := make(map[string]PushConfig)
 	for key, value := range rawConfig {
-		if key != "route" {
+		if key != "route" && key != "heartbeat_url" && key != "heartbeat_interval" {
 			// 将interface{}转换为PushConfig
 			valueBytes, err := json.Marshal(value)
 			if err != nil {
@@ -64,8 +78,10 @@ func NewConfigManager(configFile string) (*ConfigManager, error) {
 	}
 
 	return &ConfigManager{
-		Route:   route,
-		Configs: configs,
+		Route:             route,
+		HeartbeatURL:      heartbeatURL,
+		HeartbeatInterval: heartbeatInterval,
+		Configs:           configs,
 	}, nil
 }
 

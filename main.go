@@ -1,3 +1,4 @@
+// 已修改：添加心跳检测功能 (heartbeat)
 package main
 
 import (
@@ -105,6 +106,20 @@ func main() {
 		fmt.Printf("  \"route\": \"/\"          # 无前缀\n")
 		fmt.Printf("  \"route\": \"/push\"      # 有前缀\n")
 		return
+	}
+
+	// 启动心跳检测服务
+	heartbeat := &HeartbeatService{
+		URL:      configManager.HeartbeatURL,
+		Interval: configManager.HeartbeatInterval,
+	}
+	heartbeat.Start()
+
+	// 显示心跳检测状态信息
+	if configManager.HeartbeatURL != "" {
+		fmt.Printf("心跳检测已启动: %s (间隔: %d秒)\n", configManager.HeartbeatURL, configManager.HeartbeatInterval)
+	} else {
+		fmt.Println("心跳检测未配置")
 	}
 
 	// 注册动态路由

@@ -1,5 +1,7 @@
 {
   "route": "/",
+  "heartbeat_url": "",
+  "heartbeat_interval": 60,
   "dingtalk_text_example": {
     "type": "dingtalk_text",
     "config": {

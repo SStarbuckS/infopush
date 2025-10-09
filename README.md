@@ -4,13 +4,16 @@
 
 ## 主要特性
 
--**多平台支持**: 企业微信图文消息、企业微信群机器人、Telegram Bot、钉钉机器人  
--**动态路由**: 基于 URL 路径自动选择推送配置  
--**灵活配置**: JSON 配置文件，支持多个同类型推送配置  
--**全局路由前缀**: 支持反向代理和子目录部署  
--**详细日志**: 毫秒级时间戳，配置级别的日志追踪  
--**Docker 支持**: 多平台容器化部署  
+-**多平台支持**: 企业微信图文消息、企业微信群机器人、Telegram Bot、钉钉机器人
+-**动态路由**: 基于 URL 路径自动选择推送配置
+-**灵活配置**: JSON 配置文件，支持多个同类型推送配置
+-**全局路由前缀**: 支持反向代理和子目录部署
+-**心跳检测**: 独立的被动心跳检测功能，支持自定义间隔
+-**详细日志**: 毫秒级时间戳，配置级别的日志追踪
+-**Docker 支持**: 多平台容器化部署
 -**轻量高效**: 无外部依赖，单文件部署  
+
+## 快速开始
 
 ### 项目结构
 
@@ -18,6 +21,7 @@
 infopush/
 ├── main.go              # 主程序，HTTP服务器和路由处理
 ├── config.go            # 配置文件管理
+├── heartbeat.go         # 心跳检测模块
 ├── wecom_mpnews.go      # 企业微信图文消息模块
 ├── wecom_robot_text.go  # 企业微信群机器人文本消息模块
 ├── telegram_text.go     # Telegram Bot 文本消息模块  
@@ -28,8 +32,6 @@ infopush/
 ├── .dockerignore        # Docker忽略文件
 └── README.md            # 项目文档
 ```
-
-## 快速开始
 
 ### 本地运行
 
@@ -83,6 +85,8 @@ docker-compose up -d
 ```json
 {
   "route": "/",
+  "heartbeat_url": "",
+  "heartbeat_interval": 60,
   "配置名称1": {
     "type": "推送类型",
     "config": {
@@ -104,6 +108,26 @@ docker-compose up -d
   - `"/"`: 根前缀，直接访问 `/配置名/`
   - `"/push"`: 有前缀，访问 `/push/配置名/`
   - `"/api/v1/notify"`: 多级前缀
+
+### 心跳检测配置
+
+- `heartbeat_url`: 心跳检测目标 URL（留空则不启用）
+- `heartbeat_interval`: 心跳检测间隔（单位：秒）
+
+**示例**:
+```json
+{
+  "route": "/",
+  "heartbeat_url": "https://example.com/ping",
+  "heartbeat_interval": 60
+}
+```
+
+**功能说明**:
+- 如果 `heartbeat_url` 为空字符串，心跳检测不会启动
+- 心跳检测在独立的定时器中运行，不会影响其他功能
+- 每次心跳请求会在控制台输出响应状态和内容
+- 请求失败不会影响下一次执行
 
 ### 企业微信图文消息配置
 
@@ -240,27 +264,6 @@ curl -X POST "http://localhost:8080/dingtalk_text_example/" \
   -d "msg=系统告警：CPU使用率超过90%"
 ```
 
-#### Python 示例
-
-```
-def send_notification(push_content, retries=3, timeout=5):
-    push_url = "http://localhost:8080/wecom_example"
-    data = {
-        'title': '新提醒',  # 可选的
-        'msg': push_content  # 必要的
-    }
-    for attempt in range(retries):
-        try:
-            response = requests.post(push_url, data=data, timeout=timeout)
-            response.raise_for_status()  # 非2xx状态码会抛出异常
-            print(f"推送完成: {response.text}\n")
-            return
-        except Exception as error:
-            print(f"推送发生错误: {error}")
-        time.sleep(1)  # 等待一秒再重试
-    print("推送重试均失败。\n")
-```
-
 ### 响应格式
 
 **成功响应**:
@@ -336,5 +339,4 @@ Error: 具体错误信息
    - 例如：`SendWecomRobotText`、`SendTelegramText`
 3. 在 `main.go` 的 `switch` 语句中添加新的 case
 4. 在配置文件中添加对应的配置示例
-
 5. 重新编译项目
