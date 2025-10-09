@@ -1,12 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"strings"
 	"time"
 )
 
@@ -25,29 +21,6 @@ type dingTalkTextMessage struct {
 type dingTalkTextRequest struct {
 	MsgType string              `json:"msgtype"`
 	Text    dingTalkTextMessage `json:"text"`
-}
-
-// dingTalkTextHttpRequest 发送HTTP请求
-func dingTalkTextHttpRequest(url string, data []byte) ([]byte, error) {
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return body, nil
 }
 
 // SendDingTalkText 发送钉钉文本消息 - 统一接口
@@ -81,20 +54,13 @@ func SendDingTalkText(configName string, configData map[string]interface{}, para
 	}
 
 	// 发送请求
-	response, err := dingTalkTextHttpRequest(url, jsonData)
+	response, err := httpRequest("POST", url, jsonData, 30*time.Second)
 	if err != nil {
 		return "", err
 	}
 
 	responseStr := string(response)
-	fmt.Printf("[%s] %s - 钉钉文本返回响应: %s\n", time.Now().Format("2006-01-02 15:04:05.000"), configName, responseStr)
-
-	// 直接检查响应字符串
-	if strings.Contains(responseStr, `"errcode":0`) {
-		return "Success", nil
-	} else {
-		return "Error: " + responseStr, nil
-	}
+	return handleAPIResponse(configName, "钉钉文本", responseStr, `"errcode":0`)
 }
 
 // convertToDingTalkTextConfig 将通用配置转换为钉钉文本配置

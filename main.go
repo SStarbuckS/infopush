@@ -87,7 +87,16 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 返回响应
 	fmt.Printf("[%s] %s - %s\n", time.Now().Format("2006-01-02 15:04:05.000"), configPath, result)
-	fmt.Fprint(w, result)
+
+	// 根据推送结果设置HTTP状态码
+	if strings.HasPrefix(result, "Success") {
+		// 推送成功，返回200
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, result)
+	} else {
+		// 推送失败，返回500
+		http.Error(w, result, http.StatusInternalServerError)
+	}
 }
 
 func main() {

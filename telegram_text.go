@@ -1,12 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"strings"
 	"time"
 )
 
@@ -21,29 +17,6 @@ type TelegramTextConfig struct {
 type telegramTextRequest struct {
 	ChatID string `json:"chat_id"`
 	Text   string `json:"text"`
-}
-
-// telegramTextHttpRequest 发送HTTP请求
-func telegramTextHttpRequest(url string, data []byte) ([]byte, error) {
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return body, nil
 }
 
 // SendTelegramText 发送Telegram文本消息 - 统一接口
@@ -75,20 +48,13 @@ func SendTelegramText(configName string, configData map[string]interface{}, para
 	}
 
 	// 发送请求
-	response, err := telegramTextHttpRequest(url, jsonData)
+	response, err := httpRequest("POST", url, jsonData, 30*time.Second)
 	if err != nil {
 		return "", err
 	}
 
 	responseStr := string(response)
-	fmt.Printf("[%s] %s - Telegram文本返回响应: %s\n", time.Now().Format("2006-01-02 15:04:05.000"), configName, responseStr)
-
-	// 直接检查响应字符串
-	if strings.Contains(responseStr, `"ok":true`) {
-		return "Success", nil
-	} else {
-		return "Error: " + responseStr, nil
-	}
+	return handleAPIResponse(configName, "Telegram文本", responseStr, `"ok":true`)
 }
 
 // convertToTelegramTextConfig 将通用配置转换为Telegram文本配置

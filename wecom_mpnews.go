@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"strings"
 	"time"
 )
@@ -50,45 +47,12 @@ type mpNewsRequest struct {
 	MPNews  mpNews `json:"mpnews"`
 }
 
-// wecomHttpRequest 发送HTTP请求
-func wecomHttpRequest(url string, data []byte) ([]byte, error) {
-	var req *http.Request
-	var err error
-
-	if data != nil {
-		req, err = http.NewRequest("POST", url, bytes.NewBuffer(data))
-		if err != nil {
-			return nil, err
-		}
-		req.Header.Set("Content-Type", "application/json;charset=utf-8")
-	} else {
-		req, err = http.NewRequest("GET", url, nil)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return body, nil
-}
-
 // getWecomAccessToken 获取企业微信访问令牌
 func getWecomAccessToken(config WecomMPNewsConfig) (string, error) {
 	url := fmt.Sprintf("%s/cgi-bin/gettoken?corpid=%s&corpsecret=%s",
 		config.APIBaseURL, config.CorpID, config.CorpSecret)
 
-	response, err := wecomHttpRequest(url, nil)
+	response, err := httpRequest("GET", url, nil, 30*time.Second)
 	if err != nil {
 		return "", err
 	}
@@ -169,20 +133,13 @@ func SendWecomMPNews(configName string, configData map[string]interface{}, param
 		return "", err
 	}
 
-	response, err := wecomHttpRequest(url, jsonData)
+	response, err := httpRequest("POST", url, jsonData, 30*time.Second)
 	if err != nil {
 		return "", err
 	}
 
 	responseStr := string(response)
-	fmt.Printf("[%s] %s - 企业微信图文返回响应: %s\n", time.Now().Format("2006-01-02 15:04:05.000"), configName, responseStr)
-
-	// 直接检查响应字符串
-	if strings.Contains(responseStr, `"errcode":0`) {
-		return "Success", nil
-	} else {
-		return "Error: " + responseStr, nil
-	}
+	return handleAPIResponse(configName, "企业微信图文", responseStr, `"errcode":0`)
 }
 
 // convertToWecomMPNewsConfig 将通用配置转换为企业微信配置

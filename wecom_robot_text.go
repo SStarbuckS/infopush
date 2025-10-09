@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"math/rand"
-	"net/http"
-	"strings"
 	"time"
 )
 
@@ -58,25 +54,6 @@ func convertToWecomRobotTextConfig(configData map[string]interface{}) (*WecomRob
 	return config, nil
 }
 
-// wecomRobotTextHttpRequest 发送HTTP请求
-func wecomRobotTextHttpRequest(url string, data []byte) ([]byte, error) {
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-
-	client := &http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	return io.ReadAll(resp.Body)
-}
-
 // SendWecomRobotText 发送企业微信群机器人文本消息
 func SendWecomRobotText(configName string, configData map[string]interface{}, params map[string]string) (string, error) {
 	config, err := convertToWecomRobotTextConfig(configData)
@@ -110,18 +87,11 @@ func SendWecomRobotText(configName string, configData map[string]interface{}, pa
 	}
 
 	// 发送请求
-	response, err := wecomRobotTextHttpRequest(url, jsonData)
+	response, err := httpRequest("POST", url, jsonData, 30*time.Second)
 	if err != nil {
 		return "", err
 	}
 
 	responseStr := string(response)
-	fmt.Printf("[%s] %s - 企业微信群机器人文本返回响应: %s\n", time.Now().Format("2006-01-02 15:04:05.000"), configName, responseStr)
-
-	// 检查响应状态
-	if strings.Contains(responseStr, `"errcode":0`) {
-		return "Success", nil
-	} else {
-		return "Error: " + responseStr, nil
-	}
+	return handleAPIResponse(configName, "企业微信群机器人文本", responseStr, `"errcode":0`)
 }
