@@ -1,0 +1,13 @@
+# 构建产物
+infopush.exe
+infopush
+
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db 
