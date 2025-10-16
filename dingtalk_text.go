@@ -33,9 +33,6 @@ func SendDingTalkText(configName string, configData map[string]interface{}, para
 
 	// 获取消息内容
 	message := params["msg"]
-	if message == "" {
-		return "", fmt.Errorf("缺少消息内容")
-	}
 
 	// 构造完整的Webhook URL
 	url := fmt.Sprintf("%s?access_token=%s", config.APIBaseURL, config.AccessToken)

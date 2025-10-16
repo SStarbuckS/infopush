@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 )
 
 // 全局配置管理器
@@ -34,24 +33,42 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 统一检查配置路径
 	if configPath == "" {
+		ts := timestamp()
+		errorMsg := "目的地空无一物 - 缺少配置路径"
+
+		// 写入错误日志
+		writeErrorLog(ts, "", "unknown", errorMsg, nil)
+
 		http.Error(w, "目的地空无一物", http.StatusBadRequest)
-		fmt.Printf("[%s] 目的地空无一物 - 缺少配置路径\n", time.Now().Format("2006-01-02 15:04:05.000"))
+		fmt.Printf("[%s] %s\n", ts, errorMsg)
 		return
 	}
 
 	// 获取配置
 	config, exists := configManager.GetConfig(configPath)
 	if !exists {
+		ts := timestamp()
+		errorMsg := fmt.Sprintf("这里是一片荒原 - 配置 '%s' 不存在", configPath)
+
+		// 写入错误日志
+		writeErrorLog(ts, configPath, "unknown", errorMsg, nil)
+
 		http.Error(w, "这里是一片荒原", http.StatusNotFound)
-		fmt.Printf("[%s] 这里是一片荒原 - 配置 '%s' 不存在\n", time.Now().Format("2006-01-02 15:04:05.000"), configPath)
+		fmt.Printf("[%s] %s\n", ts, errorMsg)
 		return
 	}
 
 	// 获取消息内容 - 缺少msg参数
 	msg := r.FormValue("msg")
 	if msg == "" {
+		ts := timestamp()
+		errorMsg := "Wel Come! - 缺少msg参数"
+
+		// 写入错误日志
+		writeErrorLog(ts, configPath, config.Type, errorMsg, nil)
+
 		http.Error(w, "Wel Come!", http.StatusBadRequest)
-		fmt.Printf("[%s] Wel Come! - 缺少msg参数\n", time.Now().Format("2006-01-02 15:04:05.000"))
+		fmt.Printf("[%s] %s\n", ts, errorMsg)
 		return
 	}
 
@@ -74,35 +91,41 @@ func dynamicHandler(w http.ResponseWriter, r *http.Request) {
 	case "wecom_robot_text":
 		result, err = SendWecomRobotText(configPath, config.Config, params)
 	default:
-		http.Error(w, fmt.Sprintf("不支持的推送类型: %s", config.Type), http.StatusBadRequest)
-		fmt.Printf("[%s] 不支持的推送类型: %s\n", time.Now().Format("2006-01-02 15:04:05.000"), config.Type)
+		ts := timestamp()
+		errorMsg := fmt.Sprintf("不支持的推送类型: %s", config.Type)
+
+		// 写入错误日志
+		writeErrorLog(ts, configPath, config.Type, errorMsg, params)
+
+		http.Error(w, errorMsg, http.StatusBadRequest)
+		fmt.Printf("[%s] %s - %s\n", ts, configPath, errorMsg)
 		return
 	}
 
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-		fmt.Printf("[%s] Error: %v\n", time.Now().Format("2006-01-02 15:04:05.000"), err)
+		ts := timestamp()
+		errorMsg := fmt.Sprintf("Error: %v", err)
+
+		// 写入错误日志
+		writeErrorLog(ts, configPath, config.Type, errorMsg, params)
+
+		http.Error(w, errorMsg, http.StatusInternalServerError)
+		fmt.Printf("[%s] %s - %s\n", ts, configPath, errorMsg)
 		return
 	}
 
 	// 返回响应
-	fmt.Printf("[%s] %s - %s\n", time.Now().Format("2006-01-02 15:04:05.000"), configPath, result)
-
-	// 根据推送结果设置HTTP状态码
-	if strings.HasPrefix(result, "Success") {
-		// 推送成功，返回200
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, result)
-	} else {
-		// 推送失败，返回500
-		http.Error(w, result, http.StatusInternalServerError)
-	}
+	fmt.Printf("[%s] %s - %s\n", timestamp(), configPath, result)
+	fmt.Fprint(w, result)
 }
 
 func main() {
+	// 记录启动时间到日志文件
+	logStartupTime()
+
 	// 加载配置文件
 	var err error
-	configManager, err = NewConfigManager("config.json")
+	configManager, err = NewConfigManager("data/config.json")
 	if err != nil {
 		fmt.Printf("加载配置文件失败: %v\n", err)
 		return

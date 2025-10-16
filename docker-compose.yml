@@ -6,4 +6,5 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./data/config.json:/app/config.json
+      - ./data:/app/data
+ 

@@ -32,8 +32,8 @@ WORKDIR /app
 # 从构建阶段复制二进制文件
 COPY --from=builder /app/infopush .
 
-# 复制配置文件
-COPY config.json .
+# 复制 data 目录
+COPY data/ /app/data/
 
 # 修改文件权限
 RUN chmod +x infopush

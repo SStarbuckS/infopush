@@ -3,8 +3,6 @@ package main
 
 import (
 	"fmt"
-	"io"
-	"net/http"
 	"time"
 )
 
@@ -34,18 +32,11 @@ func (h *HeartbeatService) Start() {
 
 // sendHeartbeat 发送心跳请求
 func (h *HeartbeatService) sendHeartbeat() {
-	resp, err := http.Get(h.URL)
+	response, err := httpRequest("GET", h.URL, nil, 30*time.Second)
 	if err != nil {
-		fmt.Printf("[%s] 心跳检测失败: %v\n", time.Now().Format("2006-01-02 15:04:05.000"), err)
-		return
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("[%s] 心跳检测读取响应失败: %v\n", time.Now().Format("2006-01-02 15:04:05.000"), err)
+		fmt.Printf("[%s] 心跳检测失败: %v\n", timestamp(), err)
 		return
 	}
 
-	fmt.Printf("[%s] 心跳检测响应 [%d]: %s\n", time.Now().Format("2006-01-02 15:04:05.000"), resp.StatusCode, string(body))
+	fmt.Printf("[%s] 心跳检测响应: %s\n", timestamp(), string(response))
 }

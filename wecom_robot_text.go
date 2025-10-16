@@ -40,7 +40,7 @@ func convertToWecomRobotTextConfig(configData map[string]interface{}) (*WecomRob
 			if key, ok := keyInterface.(string); ok {
 				config.Keys[i] = key
 			} else {
-				return nil, fmt.Errorf("Keys 配置格式错误")
+				return nil, fmt.Errorf("配置 Keys 格式错误")
 			}
 		}
 	} else {
@@ -48,7 +48,7 @@ func convertToWecomRobotTextConfig(configData map[string]interface{}) (*WecomRob
 	}
 
 	if len(config.Keys) == 0 {
-		return nil, fmt.Errorf("Keys 配置不能为空")
+		return nil, fmt.Errorf("配置 Keys 不能为空")
 	}
 
 	return config, nil
@@ -62,9 +62,6 @@ func SendWecomRobotText(configName string, configData map[string]interface{}, pa
 	}
 
 	message := params["msg"]
-	if message == "" {
-		return "", fmt.Errorf("缺少消息内容")
-	}
 
 	// 随机选择一个机器人key
 	rand.Seed(time.Now().UnixNano())

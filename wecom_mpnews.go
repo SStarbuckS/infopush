@@ -71,9 +71,9 @@ func getWecomAccessToken(config WecomMPNewsConfig) (string, error) {
 }
 
 // createWecomMPNewsData 构造图文消息数据
-func createWecomMPNewsData(config WecomMPNewsConfig, title, content string) mpNewsRequest {
+func createWecomMPNewsData(config WecomMPNewsConfig, title, message string) mpNewsRequest {
 	// 将换行符转换为HTML换行
-	htmlContent := strings.ReplaceAll(content, "\n", "<br>")
+	htmlContent := strings.ReplaceAll(message, "\n", "<br>")
 	htmlContent = strings.ReplaceAll(htmlContent, "\r\n", "<br>")
 	htmlContent = strings.ReplaceAll(htmlContent, "\r", "<br>")
 
@@ -82,7 +82,7 @@ func createWecomMPNewsData(config WecomMPNewsConfig, title, content string) mpNe
 		ThumbMediaID: config.ThumbMediaID,
 		Author:       config.Author,
 		Content:      htmlContent,
-		Digest:       content,
+		Digest:       message,
 	}
 
 	return mpNewsRequest{
@@ -114,16 +114,16 @@ func SendWecomMPNews(configName string, configData map[string]interface{}, param
 	}
 
 	// 获取消息内容
-	content := params["msg"]
+	message := params["msg"]
 
 	// 获取访问令牌
 	accessToken, err := getWecomAccessToken(config)
 	if err != nil {
-		return "", fmt.Errorf("获取访问令牌失败: %v", err)
+		return "", err
 	}
 
 	// 构造消息数据
-	msgData := createWecomMPNewsData(config, title, content)
+	msgData := createWecomMPNewsData(config, title, message)
 
 	// 发送消息
 	url := fmt.Sprintf("%s/cgi-bin/message/send?access_token=%s", config.APIBaseURL, accessToken)

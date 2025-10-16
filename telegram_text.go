@@ -29,9 +29,6 @@ func SendTelegramText(configName string, configData map[string]interface{}, para
 
 	// 获取消息内容
 	message := params["msg"]
-	if message == "" {
-		return "", fmt.Errorf("缺少消息内容")
-	}
 
 	// 构造API URL
 	url := fmt.Sprintf("%s/bot%s/sendMessage", config.APIBaseURL, config.Token)
