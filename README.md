@@ -19,6 +19,9 @@
 
 ```
 infopush/
+├── data/                # 数据目录
+│   ├── config.json      # 配置文件
+│   └── error.log        # 错误日志（自动生成）
 ├── main.go              # 主程序，HTTP服务器和路由处理
 ├── config.go            # 配置文件管理
 ├── heartbeat.go         # 心跳检测模块
@@ -26,7 +29,6 @@ infopush/
 ├── wecom_robot_text.go  # 企业微信群机器人文本消息模块
 ├── telegram_text.go     # Telegram Bot 文本消息模块  
 ├── dingtalk_text.go     # 钉钉机器人文本消息模块
-├── config.json          # 配置文件
 ├── Dockerfile           # Docker构建文件
 ├── docker-compose.yml   # Docker Compose配置
 ├── .dockerignore        # Docker忽略文件
@@ -67,7 +69,7 @@ docker build -t infopush .
 docker run -d \
   --name infopush \
   -p 8080:8080 \
-  -v /path/to/config.json:/app/config.json \
+  -v /path/to:/app \
   infopush
 ```
 
@@ -362,4 +364,5 @@ Error: 具体错误信息
 4. 在配置文件中添加对应的配置示例
 
 5. 重新编译项目
+
 
